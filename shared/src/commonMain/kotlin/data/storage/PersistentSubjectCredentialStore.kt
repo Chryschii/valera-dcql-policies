@@ -5,6 +5,7 @@ import at.asitplus.iso.IssuerSigned
 import at.asitplus.wallet.app.common.Configuration
 import at.asitplus.wallet.lib.agent.SubjectCredentialStore
 import at.asitplus.wallet.lib.data.ConstantIndex
+import at.asitplus.wallet.lib.data.DisclosurePolicy
 import at.asitplus.wallet.lib.data.SelectiveDisclosureItem
 import at.asitplus.wallet.lib.data.VerifiableCredentialJws
 import at.asitplus.wallet.lib.data.VerifiableCredentialSdJwt
@@ -48,11 +49,13 @@ class PersistentSubjectCredentialStore(
         vcSerialized: String,
         disclosures: Map<String, SelectiveDisclosureItem?>,
         scheme: ConstantIndex.CredentialScheme,
+        disclosurePolicies: List<DisclosurePolicy>?
     ) = SubjectCredentialStore.StoreEntry.SdJwt(
         vcSerialized,
         vc,
         disclosures,
         scheme.schemaUri,
+        disclosurePolicies = disclosurePolicies
     ).also {
         addStoreEntry(it)
     }

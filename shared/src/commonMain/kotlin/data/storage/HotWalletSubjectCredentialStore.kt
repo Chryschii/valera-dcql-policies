@@ -4,6 +4,7 @@ import at.asitplus.KmmResult
 import at.asitplus.iso.IssuerSigned
 import at.asitplus.wallet.lib.agent.SubjectCredentialStore
 import at.asitplus.wallet.lib.data.ConstantIndex
+import at.asitplus.wallet.lib.data.DisclosurePolicy
 import at.asitplus.wallet.lib.data.SelectiveDisclosureItem
 import at.asitplus.wallet.lib.data.VerifiableCredentialJws
 import at.asitplus.wallet.lib.data.VerifiableCredentialSdJwt
@@ -64,12 +65,14 @@ class HotWalletSubjectCredentialStore(
         vc: VerifiableCredentialSdJwt,
         vcSerialized: String,
         disclosures: Map<String, SelectiveDisclosureItem?>,
-        scheme: ConstantIndex.CredentialScheme
+        scheme: ConstantIndex.CredentialScheme,
+        disclosurePolicies: List<DisclosurePolicy>?
     ): SubjectCredentialStore.StoreEntry = delegate.storeCredential(
         vc = vc,
         vcSerialized = vcSerialized,
         disclosures = disclosures,
         scheme = scheme,
+        disclosurePolicies = disclosurePolicies
     )
 
     override suspend fun storeCredential(
