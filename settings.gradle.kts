@@ -16,13 +16,13 @@ plugins {
 }
 
 
-val vckDir= file("../vck")
-val signumFile=file("../vck/signum/build.gradle.kts")
+val vckDir= file("../vck-dcql-policies")
+val signumFile=file("../vck-dcql-policies/signum/build.gradle.kts")
 if (vckDir.isDirectory && signumFile.exists()) {
     logger.warn("Detected VC-K in ${vckDir.absolutePath}.")
     logger.warn("Including VC-K and Signum as composite build.")
     logger.warn("If you do not want this, move the VC-K to another location!")
-    includeBuild("../vck")
+    includeBuild("../vck-dcql-policies")
 }
 
 dependencyResolutionManagement {
