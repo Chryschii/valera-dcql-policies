@@ -54,8 +54,8 @@ class PersistentSubjectCredentialStore(
         vcSerialized,
         vc,
         disclosures,
+        disclosurePolicies = disclosurePolicies,
         scheme.schemaUri,
-        disclosurePolicies = disclosurePolicies
     ).also {
         addStoreEntry(it)
     }
@@ -101,7 +101,8 @@ class PersistentSubjectCredentialStore(
                         vcSerialized = storeEntry.vcSerialized,
                         sdJwt = storeEntry.sdJwt,
                         disclosures = storeEntry.disclosures,
-                        exportableCredentialScheme = storeEntry.scheme!!.toExportableCredentialScheme(),
+                        disclosurePolicies = storeEntry.disclosurePolicies,
+                        exportableCredentialScheme = storeEntry.scheme!!.toExportableCredentialScheme()
                     )
                 }
 
@@ -171,6 +172,7 @@ class PersistentSubjectCredentialStore(
                             storeEntry.vcSerialized,
                             storeEntry.sdJwt,
                             storeEntry.disclosures,
+                            storeEntry.disclosurePolicies,
                             storeEntry.exportableCredentialScheme.toScheme().schemaUri,
                         )
                     }
@@ -234,7 +236,8 @@ private sealed interface ExportableStoreEntry {
          * Map of original serialized disclosure item to parsed item
          */
         val disclosures: Map<String, SelectiveDisclosureItem?>,
-        override val exportableCredentialScheme: ExportableCredentialScheme
+        val disclosurePolicies: List<DisclosurePolicy>?,
+        override val exportableCredentialScheme: ExportableCredentialScheme,
     ) : ExportableStoreEntry
 
     @Serializable
