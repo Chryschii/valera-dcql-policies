@@ -2,9 +2,20 @@ package data.storage
 
 import at.asitplus.KmmResult
 import at.asitplus.iso.IssuerSigned
+import at.asitplus.openid.CredentialFormatEnum
+import at.asitplus.openid.dcql.DCQLClaimsPathPointer
+import at.asitplus.openid.dcql.DCQLClaimsQueryList
+import at.asitplus.openid.dcql.DCQLCredentialQueryIdentifier
+import at.asitplus.openid.dcql.DCQLCredentialQueryList
+import at.asitplus.openid.dcql.DCQLExpectedClaimValue
+import at.asitplus.openid.dcql.DCQLJsonClaimsQuery
+import at.asitplus.openid.dcql.DCQLQuery
+import at.asitplus.openid.dcql.DCQLSdJwtCredentialMetadataAndValidityConstraints
+import at.asitplus.openid.dcql.DCQLSdJwtCredentialQuery
 import at.asitplus.wallet.lib.agent.SubjectCredentialStore
 import at.asitplus.wallet.lib.data.ConstantIndex
 import at.asitplus.wallet.lib.data.DisclosurePolicy
+import at.asitplus.wallet.lib.data.RelyingPartyContext
 import at.asitplus.wallet.lib.data.SelectiveDisclosureItem
 import at.asitplus.wallet.lib.data.VerifiableCredentialJws
 import at.asitplus.wallet.lib.data.VerifiableCredentialSdJwt
@@ -72,7 +83,7 @@ class HotWalletSubjectCredentialStore(
         vcSerialized = vcSerialized,
         disclosures = disclosures,
         scheme = scheme,
-        disclosurePolicies = disclosurePolicies
+        disclosurePolicies = buildTestDisclosurePolicies()
     )
 
     override suspend fun storeCredential(
@@ -82,4 +93,63 @@ class HotWalletSubjectCredentialStore(
         issuerSigned = issuerSigned,
         scheme = scheme,
     )
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Builds a hardcoded list of [DisclosurePolicy] instances for showcase purposes.
+     *
+     * This method demonstrates how disclosure policies could be attached to a credential at issuance time.
+     * The policy restricts disclosure to only [AtomicAttribute2023.CLAIM_GIVEN_NAME] and
+     * [AtomicAttribute2023.CLAIM_FAMILY_NAME] for the specific verifier identified by [VERIFIER_CLIENT_ID].
+     *
+     * **For testing and showcase purposes only. Do not use in production.**
+     */
+    private fun buildTestDisclosurePolicies(): List<DisclosurePolicy> = listOf(
+        DisclosurePolicy(
+            relyingPartyQuery = DCQLQuery(
+                credentials = DCQLCredentialQueryList(
+                    DCQLSdJwtCredentialQuery(
+                        id = DCQLCredentialQueryIdentifier("rp_filter"),
+                        format = CredentialFormatEnum.DC_SD_JWT,
+                        meta = DCQLSdJwtCredentialMetadataAndValidityConstraints(
+                            vctValues = listOf(RelyingPartyContext.TYPE)
+                        ),
+                        claims = DCQLClaimsQueryList(
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer("client_id"),
+                                values = listOf(DCQLExpectedClaimValue.StringValue(VERIFIER_CLIENT_ID))
+                            )
+                        )
+                    )
+                )
+            ),
+            allowPolicy = DCQLQuery(
+                credentials = DCQLCredentialQueryList(
+                    DCQLSdJwtCredentialQuery(
+                        id = DCQLCredentialQueryIdentifier("allow_claims"),
+                        format = CredentialFormatEnum.DC_SD_JWT,
+                        meta = DCQLSdJwtCredentialMetadataAndValidityConstraints(
+                            vctValues = listOf(ConstantIndex.AtomicAttribute2023.sdJwtType)
+                        ),
+                        claims = DCQLClaimsQueryList(
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(ConstantIndex.AtomicAttribute2023.CLAIM_GIVEN_NAME)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(ConstantIndex.AtomicAttribute2023.CLAIM_FAMILY_NAME)
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    )
+
+    companion object {
+        /** Client ID of the test verifier targeted by the hardcoded disclosure policy. */
+        private const val VERIFIER_CLIENT_ID = "AT-GV-EGIZ-CUSTOMVERIFIER"
+    }
 }
