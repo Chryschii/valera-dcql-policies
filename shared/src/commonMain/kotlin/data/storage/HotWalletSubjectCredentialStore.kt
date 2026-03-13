@@ -12,6 +12,8 @@ import at.asitplus.openid.dcql.DCQLJsonClaimsQuery
 import at.asitplus.openid.dcql.DCQLQuery
 import at.asitplus.openid.dcql.DCQLSdJwtCredentialMetadataAndValidityConstraints
 import at.asitplus.openid.dcql.DCQLSdJwtCredentialQuery
+import at.asitplus.wallet.eupid.EuPidScheme
+import at.asitplus.wallet.eupidsdjwt.EuPidSdJwtScheme
 import at.asitplus.wallet.lib.agent.SubjectCredentialStore
 import at.asitplus.wallet.lib.data.ConstantIndex
 import at.asitplus.wallet.lib.data.DisclosurePolicy
@@ -102,8 +104,8 @@ class HotWalletSubjectCredentialStore(
      * Builds a hardcoded list of [DisclosurePolicy] instances for showcase purposes.
      *
      * This method demonstrates how disclosure policies could be attached to a credential at issuance time.
-     * The policy restricts disclosure to only [AtomicAttribute2023.CLAIM_GIVEN_NAME] and
-     * [AtomicAttribute2023.CLAIM_FAMILY_NAME] for the specific verifier identified by [VERIFIER_CLIENT_ID].
+     * The policy restricts disclosure to only a certain set of EuPid claims
+     * for the specific verifier identified by [VERIFIER_CLIENT_ID].
      *
      * **For testing and showcase purposes only. Do not use in production.**
      */
@@ -126,21 +128,45 @@ class HotWalletSubjectCredentialStore(
                     )
                 )
             ),
-            allowPolicy = DCQLQuery(
+            allowQuery = DCQLQuery(
                 credentials = DCQLCredentialQueryList(
                     DCQLSdJwtCredentialQuery(
                         id = DCQLCredentialQueryIdentifier("allow_claims"),
                         format = CredentialFormatEnum.DC_SD_JWT,
                         meta = DCQLSdJwtCredentialMetadataAndValidityConstraints(
-                            vctValues = listOf(ConstantIndex.AtomicAttribute2023.sdJwtType)
+                            vctValues = listOf(EuPidScheme.sdJwtType)
                         ),
                         claims = DCQLClaimsQueryList(
                             DCQLJsonClaimsQuery(
-                                path = DCQLClaimsPathPointer(ConstantIndex.AtomicAttribute2023.CLAIM_GIVEN_NAME)
+                                path = DCQLClaimsPathPointer(EuPidSdJwtScheme.SdJwtAttributes.FAMILY_NAME)
                             ),
                             DCQLJsonClaimsQuery(
-                                path = DCQLClaimsPathPointer(ConstantIndex.AtomicAttribute2023.CLAIM_FAMILY_NAME)
-                            )
+                                path = DCQLClaimsPathPointer(EuPidSdJwtScheme.SdJwtAttributes.GIVEN_NAME)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(EuPidSdJwtScheme.SdJwtAttributes.BIRTH_DATE)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(EuPidScheme.Attributes.BIRTH_DATE)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(EuPidSdJwtScheme.SdJwtAttributes.ISSUANCE_DATE)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(EuPidScheme.Attributes.ISSUANCE_DATE)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(EuPidSdJwtScheme.SdJwtAttributes.EXPIRY_DATE)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(EuPidScheme.Attributes.EXPIRY_DATE)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(EuPidSdJwtScheme.SdJwtAttributes.ISSUING_COUNTRY)
+                            ),
+                            DCQLJsonClaimsQuery(
+                                path = DCQLClaimsPathPointer(EuPidScheme.Attributes.ISSUING_COUNTRY)
+                            ),
                         )
                     )
                 )
