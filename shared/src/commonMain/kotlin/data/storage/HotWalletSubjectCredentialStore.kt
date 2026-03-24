@@ -16,7 +16,7 @@ import at.asitplus.wallet.eupid.EuPidScheme
 import at.asitplus.wallet.eupidsdjwt.EuPidSdJwtScheme
 import at.asitplus.wallet.lib.agent.SubjectCredentialStore
 import at.asitplus.wallet.lib.data.ConstantIndex
-import at.asitplus.wallet.lib.data.DisclosurePolicy
+import at.asitplus.wallet.lib.data.DisclosureDirective
 import at.asitplus.wallet.lib.data.RelyingPartyContext
 import at.asitplus.wallet.lib.data.SelectiveDisclosureItem
 import at.asitplus.wallet.lib.data.VerifiableCredentialJws
@@ -79,13 +79,11 @@ class HotWalletSubjectCredentialStore(
         vcSerialized: String,
         disclosures: Map<String, SelectiveDisclosureItem?>,
         scheme: ConstantIndex.CredentialScheme,
-        disclosurePolicies: List<DisclosurePolicy>?
     ): SubjectCredentialStore.StoreEntry = delegate.storeCredential(
-        vc = vc,
+        vc = vc.copy(disclosurePolicy = buildTestDisclosurePolicy()),
         vcSerialized = vcSerialized,
         disclosures = disclosures,
         scheme = scheme,
-        disclosurePolicies = buildTestDisclosurePolicies()
     )
 
     override suspend fun storeCredential(
@@ -101,7 +99,7 @@ class HotWalletSubjectCredentialStore(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Builds a hardcoded list of [DisclosurePolicy] instances for showcase purposes.
+     * Builds a hardcoded list of [DisclosureDirective] instances for showcase purposes.
      *
      * This method demonstrates how disclosure policies could be attached to a credential at issuance time.
      * The policy restricts disclosure to only a certain set of EuPid claims
@@ -109,8 +107,8 @@ class HotWalletSubjectCredentialStore(
      *
      * **For testing and showcase purposes only. Do not use in production.**
      */
-    private fun buildTestDisclosurePolicies(): List<DisclosurePolicy> = listOf(
-        DisclosurePolicy(
+    private fun buildTestDisclosurePolicy(): List<DisclosureDirective> = listOf(
+        DisclosureDirective(
             relyingPartyQuery = DCQLQuery(
                 credentials = DCQLCredentialQueryList(
                     DCQLSdJwtCredentialQuery(

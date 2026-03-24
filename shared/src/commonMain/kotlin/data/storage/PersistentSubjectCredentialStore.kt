@@ -5,7 +5,6 @@ import at.asitplus.iso.IssuerSigned
 import at.asitplus.wallet.app.common.Configuration
 import at.asitplus.wallet.lib.agent.SubjectCredentialStore
 import at.asitplus.wallet.lib.data.ConstantIndex
-import at.asitplus.wallet.lib.data.DisclosurePolicy
 import at.asitplus.wallet.lib.data.SelectiveDisclosureItem
 import at.asitplus.wallet.lib.data.VerifiableCredentialJws
 import at.asitplus.wallet.lib.data.VerifiableCredentialSdJwt
@@ -49,12 +48,10 @@ class PersistentSubjectCredentialStore(
         vcSerialized: String,
         disclosures: Map<String, SelectiveDisclosureItem?>,
         scheme: ConstantIndex.CredentialScheme,
-        disclosurePolicies: List<DisclosurePolicy>?
     ) = SubjectCredentialStore.StoreEntry.SdJwt(
         vcSerialized,
         vc,
         disclosures,
-        disclosurePolicies = disclosurePolicies,
         scheme.schemaUri,
     ).also {
         addStoreEntry(it)
@@ -101,7 +98,6 @@ class PersistentSubjectCredentialStore(
                         vcSerialized = storeEntry.vcSerialized,
                         sdJwt = storeEntry.sdJwt,
                         disclosures = storeEntry.disclosures,
-                        disclosurePolicies = storeEntry.disclosurePolicies,
                         exportableCredentialScheme = storeEntry.scheme!!.toExportableCredentialScheme()
                     )
                 }
@@ -172,7 +168,6 @@ class PersistentSubjectCredentialStore(
                             storeEntry.vcSerialized,
                             storeEntry.sdJwt,
                             storeEntry.disclosures,
-                            storeEntry.disclosurePolicies,
                             storeEntry.exportableCredentialScheme.toScheme().schemaUri,
                         )
                     }
@@ -236,7 +231,6 @@ private sealed interface ExportableStoreEntry {
          * Map of original serialized disclosure item to parsed item
          */
         val disclosures: Map<String, SelectiveDisclosureItem?>,
-        val disclosurePolicies: List<DisclosurePolicy>?,
         override val exportableCredentialScheme: ExportableCredentialScheme,
     ) : ExportableStoreEntry
 
